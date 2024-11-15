@@ -3,12 +3,18 @@ package com.example.itc362_hw7_ex2a
 import android.content.Context
 import androidx.room.Room
 import com.example.itc362_hw7_ex2a.database.CrimeDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import java.util.*
 
 private const val DATABASE_NAME = "crime-database"
 
-class CrimeRepository private constructor(context: Context) {
+class CrimeRepository private constructor(
+    context:Context,
+    private val coroutineScope : CoroutineScope = GlobalScope
+) {
 
     private val database: CrimeDatabase = Room
         .databaseBuilder(
@@ -19,9 +25,18 @@ class CrimeRepository private constructor(context: Context) {
         .createFromAsset(DATABASE_NAME)
         .build()
 
-   // suspend fun  getCrimes(): List<Crime> = database.crimeDAO().getCrimes()
-    fun  getCrimes(): Flow<List<Crime>> = database.crimeDAO().getCrimes()
+    suspend fun getCrimes(): Flow<List<Crime>> = database.crimeDAO().getCrimes()
+
     suspend fun getCrime(id: UUID): Crime = database.crimeDAO().getCrime(id)
+
+    fun updateCrime(crime:Crime){
+        coroutineScope.launch {
+
+            database.crimeDAO().updateCrime(crime)
+        }
+
+    }
+
 
     companion object {
         private var INSTANCE: CrimeRepository? = null
@@ -37,6 +52,4 @@ class CrimeRepository private constructor(context: Context) {
                 ?: throw IllegalStateException("CrimeRepository must be initialized")
         }
     }
-
-
 }
