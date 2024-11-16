@@ -104,7 +104,7 @@ class CrimeDetailFragment :Fragment(){
             }
         }
 
-
+        // If the title of crime is blank after update, require user enter a title
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 val title = binding.crimeTitle.text.toString()
